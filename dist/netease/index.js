@@ -5,7 +5,15 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = _default;
 
+var _fly = _interopRequireDefault(require("flyio/dist/npm/fly"));
+
+var _engineWrapper = _interopRequireDefault(require("flyio/dist/npm/engine-wrapper"));
+
+var _intercepters = _interopRequireDefault(require("./intercepters"));
+
 var _util = require("../util");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -36,7 +44,11 @@ const top_list_all = {
   "21": ["Beatport全球电子舞曲榜", "3812895"]
 };
 
-function _default(instance) {
+function _default(adapter) {
+  const engine = (0, _engineWrapper.default)(adapter);
+  const instance = new _fly.default(engine);
+  (0, _intercepters.default)(instance);
+
   const getMusicInfo = (info, privilege) => {
     if (!privilege) {
       privilege = info.privilege;
@@ -135,12 +147,7 @@ function _default(instance) {
             }
           };
         } catch (e) {
-          console.warn(e);
-          return {
-            status: false,
-            msg: '获取失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -169,11 +176,7 @@ function _default(instance) {
             data: getMusicInfo(info, data.privileges[0])
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -199,11 +202,7 @@ function _default(instance) {
             data: data.songs.map(info => getMusicInfo(info, privilegeObject[info.id]))
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -230,11 +229,7 @@ function _default(instance) {
             }
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '获取失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -275,11 +270,7 @@ function _default(instance) {
             };
           }
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -309,11 +300,7 @@ function _default(instance) {
             }
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '获取失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -340,11 +327,7 @@ function _default(instance) {
             }
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -370,11 +353,7 @@ function _default(instance) {
             }
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -435,11 +414,7 @@ function _default(instance) {
             }
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -466,11 +441,7 @@ function _default(instance) {
             }
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -494,11 +465,7 @@ function _default(instance) {
             data: eval(banners)
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -516,11 +483,7 @@ function _default(instance) {
             data
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -543,11 +506,7 @@ function _default(instance) {
             }
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -566,11 +525,7 @@ function _default(instance) {
             data: data.playlists
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -590,11 +545,7 @@ function _default(instance) {
             data
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -612,11 +563,7 @@ function _default(instance) {
             data: data.recommend.map(item => getMusicInfo2(item))
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     },
@@ -635,11 +582,7 @@ function _default(instance) {
             data: data.result
           };
         } catch (e) {
-          return {
-            status: false,
-            msg: '请求失败',
-            log: e
-          };
+          return e;
         }
       })();
     }

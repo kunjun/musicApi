@@ -1,4 +1,4 @@
-import {randomUserAgent} from '../../util'
+import {randomUserAgent} from '../util'
 
 const getACSRFToken = function (cookie) {
     function e(e) {
@@ -9,8 +9,7 @@ const getACSRFToken = function (cookie) {
 
     return e(cookie)
 }
-export default function (createInstance) {
-    const fly = createInstance()
+export default function interceptersMixin(fly) {
     // fly.config.proxy = 'http://localhost:8888'
     fly.config.baseURL = 'https://c.y.qq.com'
     fly.config.timeout = 5000

@@ -1,5 +1,5 @@
-import Cache from '../cache'
-import Crypto from "../crypto"
+import Cache from './cache'
+import Crypto from "./crypto"
 import querystring from 'querystring'
 
 let first = true
@@ -35,8 +35,7 @@ const getBody = (api, body) => {
         data: queryStr
     }
 }
-export default function (createInstance) {
-    const fly = createInstance()
+export default function interceptersMixin(fly) {
     // fly.config.proxy = 'http://localhost:8888'
     fly.config.baseURL = 'http://acs.m.xiami.com/h5'
     fly.config.timeout = 5000

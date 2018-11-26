@@ -5,13 +5,25 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = _default;
 
+var _fly = _interopRequireDefault(require("flyio/dist/npm/fly"));
+
+var _engineWrapper = _interopRequireDefault(require("flyio/dist/npm/engine-wrapper"));
+
+var _intercepters = _interopRequireDefault(require("./intercepters"));
+
 var _util = require("../util");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-function _default(instance) {
+function _default(adapter) {
+  const engine = (0, _engineWrapper.default)(adapter);
+  const instance = new _fly.default(engine);
+  (0, _intercepters.default)(instance);
+
   const getMusicInfo = info => {
     const file = info.file;
     return {

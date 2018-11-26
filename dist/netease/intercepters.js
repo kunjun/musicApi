@@ -3,17 +3,16 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = _default;
+exports.default = interceptersMixin;
 
-var _util = require("../../util");
+var _util = require("../util");
 
-var _crypto = _interopRequireDefault(require("../crypto"));
+var _crypto = _interopRequireDefault(require("./crypto"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _default(createInstance) {
-  const fly = createInstance(); // fly.config.proxy = 'http://localhost:8888'
-
+function interceptersMixin(fly) {
+  // fly.config.proxy = 'http://localhost:8888'
   fly.config.baseURL = 'http://music.163.com';
   fly.config.timeout = 5000;
   fly.config.headers = {
@@ -69,6 +68,12 @@ function _default(createInstance) {
     }
 
     return data;
-  }, e => Promise.reject(e));
-  return fly;
+  }, e => {
+    console.warn(e);
+    return Promise.reject({
+      status: false,
+      msg: '请求失败',
+      log: e
+    });
+  });
 }

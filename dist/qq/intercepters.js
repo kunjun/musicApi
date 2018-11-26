@@ -3,9 +3,9 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = _default;
+exports.default = interceptersMixin;
 
-var _util = require("../../util");
+var _util = require("../util");
 
 const getACSRFToken = function getACSRFToken(cookie) {
   function e(e) {
@@ -17,9 +17,8 @@ const getACSRFToken = function getACSRFToken(cookie) {
   return e(cookie);
 };
 
-function _default(createInstance) {
-  const fly = createInstance(); // fly.config.proxy = 'http://localhost:8888'
-
+function interceptersMixin(fly) {
+  // fly.config.proxy = 'http://localhost:8888'
   fly.config.baseURL = 'https://c.y.qq.com';
   fly.config.timeout = 5000;
   fly.config.parseJson = false;

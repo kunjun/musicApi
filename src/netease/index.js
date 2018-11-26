@@ -1,3 +1,6 @@
+import Fly from 'flyio/dist/npm/fly'
+import EngineWrapper from "flyio/dist/npm/engine-wrapper"
+import interceptersMixin from './intercepters'
 import {lyric_decode, noSongsDetailMsg} from '../util'
 
 const top_list_all = {
@@ -25,7 +28,10 @@ const top_list_all = {
     "21": ["Beatport全球电子舞曲榜", "3812895"]
 }
 
-export default function (instance) {
+export default function (adapter) {
+    const engine = EngineWrapper(adapter)
+    const instance = new Fly(engine)
+    interceptersMixin(instance)
     const getMusicInfo = (info, privilege) => {
         if (!privilege) {
             privilege = info.privilege
@@ -109,12 +115,7 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
-                console.warn(e)
-                return {
-                    status: false,
-                    msg: '获取失败',
-                    log: e
-                }
+                return e
             }
         },
         async getSongDetail(id) {
@@ -136,11 +137,7 @@ export default function (instance) {
                     data: getMusicInfo(info, data.privileges[0])
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getBatchSongDetail(ids) {
@@ -160,11 +157,7 @@ export default function (instance) {
                     data: data.songs.map(info => getMusicInfo(info, privilegeObject[info.id]))
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getSongUrl(id, br = 128000) {
@@ -185,11 +178,7 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '获取失败',
-                    log: e
-                }
+                return e
             }
         },
         async getLyric(id) {
@@ -223,11 +212,7 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getTopList(id) {
@@ -251,11 +236,7 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '获取失败',
-                    log: e
-                }
+                return e
             }
         },
         async getComment(rid, page, limit = 20) {
@@ -275,11 +256,7 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getArtistSongs(id, offset, limit) {
@@ -302,11 +279,7 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getPlaylistDetail(id, offset, limit) {
@@ -354,11 +327,7 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getAlbumDetail(id) {
@@ -379,11 +348,7 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getBanner() {
@@ -403,11 +368,7 @@ export default function (instance) {
                     data: eval(banners)
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getMvDetail(id) {
@@ -420,11 +381,7 @@ export default function (instance) {
                     data
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getMvComment(id, page = 1, limit = 20) {
@@ -444,11 +401,7 @@ export default function (instance) {
                     }
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getTopPlaylist(cat = '全部', page = 1, limit = 20) {
@@ -464,11 +417,7 @@ export default function (instance) {
                     data: data.playlists
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getNewestMvs(limit = 20) {
@@ -483,11 +432,7 @@ export default function (instance) {
                     data
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getRecommendSongs(page = 1, limit = 30) {
@@ -502,11 +447,7 @@ export default function (instance) {
                     data: data.recommend.map(item => getMusicInfo2(item))
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         },
         async getPersonalizedPlaylist(page = 1, limit = 30) {
@@ -522,11 +463,7 @@ export default function (instance) {
                     data: data.result
                 }
             } catch (e) {
-                return {
-                    status: false,
-                    msg: '请求失败',
-                    log: e
-                }
+                return e
             }
         }
     }

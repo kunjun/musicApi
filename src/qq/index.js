@@ -1,6 +1,12 @@
+import Fly from 'flyio/dist/npm/fly'
+import EngineWrapper from "flyio/dist/npm/engine-wrapper"
+import interceptersMixin from './intercepters'
 import {lyric_decode, noSongsDetailMsg} from '../util'
 
-export default function (instance) {
+export default function (adapter) {
+    const engine = EngineWrapper(adapter)
+    const instance = new Fly(engine)
+    interceptersMixin(instance)
     const getMusicInfo = (info) => {
         const file = info.file
         return {

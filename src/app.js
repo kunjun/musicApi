@@ -1,7 +1,7 @@
 import musicApi from './music-api'
-import instance from './util/flyio.node'
+import adapter from 'flyio/src/adapter/node'
 
-const app = musicApi(instance)
+const app = musicApi(adapter)
 
 export const qq = app.qq
 export const netease = app.netease

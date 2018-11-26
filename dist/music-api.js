@@ -11,22 +11,16 @@ var _qq = _interopRequireDefault(require("./qq"));
 
 var _xiami = _interopRequireDefault(require("./xiami"));
 
-var _base = _interopRequireDefault(require("./netease/instance/base"));
-
-var _base2 = _interopRequireDefault(require("./qq/instance/base"));
-
-var _base3 = _interopRequireDefault(require("./xiami/instance/base"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-function _default(instance) {
-  const netease = (0, _netease.default)((0, _base.default)(instance));
-  const qq = (0, _qq.default)((0, _base2.default)(instance));
-  const xiami = (0, _xiami.default)((0, _base3.default)(instance));
+function _default(adapter) {
+  const netease = (0, _netease.default)(adapter);
+  const qq = (0, _qq.default)(adapter);
+  const xiami = (0, _xiami.default)(adapter);
   const vendors = ['netease', 'qq', 'xiami'];
 
   const paramsVerify = (vendor, id) => {

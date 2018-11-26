@@ -1,8 +1,7 @@
-import {randomUserAgent, completeCookie} from '../../util'
-import Encrypt from '../crypto'
+import {randomUserAgent, completeCookie} from '../util'
+import Encrypt from './crypto'
 
-export default function (createInstance) {
-    const fly = createInstance()
+export default function interceptersMixin(fly) {
     // fly.config.proxy = 'http://localhost:8888'
     fly.config.baseURL = 'http://music.163.com'
     fly.config.timeout = 5000
@@ -54,7 +53,12 @@ export default function (createInstance) {
             })
         }
         return data
-    }, e => Promise.reject(e))
-
-    return fly
+    }, e => {
+        console.warn(e)
+        return Promise.reject({
+            status: false,
+            msg: '请求失败',
+            log: e
+        })
+    })
 }

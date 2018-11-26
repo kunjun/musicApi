@@ -1,15 +1,11 @@
 import Netease from './netease'
 import QQ from './qq'
 import Xiami from './xiami'
-import neteaseBase from './netease/instance/base'
-import qqBase from './qq/instance/base'
-import xiamiBase from './xiami/instance/base'
 
-export default function (instance) {
-    const netease = Netease(neteaseBase(instance))
-    const qq = QQ(qqBase(instance))
-    const xiami = Xiami(xiamiBase(instance))
-
+export default function (adapter) {
+    const netease = Netease(adapter)
+    const qq = QQ(adapter)
+    const xiami = Xiami(adapter)
     const vendors = ['netease', 'qq', 'xiami']
     const paramsVerify = (vendor, id) => {
         // 参数校验

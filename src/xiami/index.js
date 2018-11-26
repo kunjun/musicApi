@@ -1,9 +1,15 @@
+import Fly from 'flyio/dist/npm/fly'
+import EngineWrapper from "flyio/dist/npm/engine-wrapper"
+import interceptersMixin from './intercepters'
 import {lyric_decode, noSongsDetailMsg} from '../util'
 
 const replaceImage = (url = '') => {
     return url.replace('http', 'https').replace('_1.jpg', '_4.jpg').replace('_1.png', '_4.png')
 }
-export default function (instance) {
+export default function (adapter) {
+    const engine = EngineWrapper(adapter)
+    const instance = new Fly(engine)
+    interceptersMixin(instance)
     const getMusicInfo = (info) => {
         const purviewRoleVOs = info.purviewRoleVOs
         const brObject = {}

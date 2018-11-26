@@ -30,7 +30,7 @@ module.exports = [
     }, {
         mode: 'production',
         entry: {
-            'app.electron': './src/app.electron.js'
+            'app.custom-adapter': './src/music-api.js'
         },
         output: {
             path: path.resolve(__dirname, 'dist'),

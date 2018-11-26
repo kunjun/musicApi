@@ -3,11 +3,13 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = _default;
+exports.default = interceptersMixin;
 
-var _cache = _interopRequireDefault(require("../cache"));
+var _cache = _interopRequireDefault(require("./cache"));
 
-var _crypto = _interopRequireDefault(require("../crypto"));
+var _crypto = _interopRequireDefault(require("./crypto"));
+
+var _querystring = _interopRequireDefault(require("querystring"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -15,7 +17,7 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-let haveEnableToken = false;
+let first = true;
 
 const getBody = (api, body) => {
   const queryStr = JSON.stringify({
@@ -35,7 +37,9 @@ const getBody = (api, body) => {
   const appKey = 12574478;
   const t = new Date().getTime();
 
-  const sign = _crypto.default.MD5(`${_cache.default.cache.signedToken}&${t}&${appKey}&${queryStr}`);
+  const cache = _cache.default.getCache();
+
+  const sign = _crypto.default.MD5(`${cache ? cache.signedToken : ''}&${t}&${appKey}&${queryStr}`);
 
   return {
     appKey,
@@ -50,22 +54,44 @@ const getBody = (api, body) => {
   };
 };
 
-function _default(createInstance) {
-  const fly = createInstance(); // fly.config.proxy = 'http://localhost:8888'
-
+function interceptersMixin(fly) {
+  // fly.config.proxy = 'http://localhost:8888'
   fly.config.baseURL = 'http://acs.m.xiami.com/h5';
   fly.config.timeout = 5000;
   fly.config.headers = {
     Host: 'acs.m.xiami.com',
     'Content-Type': 'application/x-www-form-urlencoded'
   };
+  fly.config.rejectUnauthorized = false;
   fly.interceptors.request.use(request => {
-    if (!haveEnableToken || _cache.default.cache.expire && +new Date() > _cache.default.cache.expire) {
-      // 没有确认可用的token 先锁队列 只放行第一个
+    if (request.pureFly) {
+      request.headers = {};
+      request.baseURL = '';
+      return request;
+    }
+
+    if (request.webApi) {
+      request.baseURL = 'http://api.xiami.com';
+      request.headers = {
+        Cookie: 'user_from=2;XMPLAYER_addSongsToggler=0;XMPLAYER_isOpen=0;_xiamitoken=cb8bfadfe130abdbf5e2282c30f0b39a;',
+        Referer: 'http://h.xiami.com/'
+      };
+
+      const query = _querystring.default.stringify(request.body);
+
+      request.body = query;
+      request.url += query;
+      return request;
+    }
+
+    const cache = _cache.default.getCache(); // 第一次请求 或 没有缓存 先锁队列 只放行第一个
+
+
+    if (first || !cache) {
       fly.lock();
     }
 
-    request.headers.cookie = (_cache.default.cache.token || []).join(';');
+    request.headers.Cookie = `uidXM=1; ${cache ? cache.cookie : ''}`;
     request.bodycopy = request.body;
     request.body = getBody(request.url, request.body);
     request.urlcopy = request.url;
@@ -76,28 +102,49 @@ function _default(createInstance) {
   /*#__PURE__*/
   function () {
     var _ref = _asyncToGenerator(function* (res) {
+      if (res.request.pureFly) {
+        return res;
+      }
+
+      if (res.request.webApi) {
+        if (!res.data) {
+          return Promise.reject({
+            status: false,
+            msg: '请求无结果'
+          });
+        }
+
+        if (res.data.state !== 0 && !res.data.status) {
+          return Promise.reject({
+            status: false,
+            msg: '请求失败',
+            log: res.data
+          });
+        }
+
+        return res.data.data;
+      }
+
+      first = false;
+
       try {
         // 只要返了cookie 就更新token
         if (res.headers['set-cookie']) {
-          const token = res.headers['set-cookie'].split('Path=/,').map(i => i.split(';')[0].trim());
-          const myToken = token[0].replace('_m_h5_tk=', '').split('_')[0];
-
-          _cache.default.setCache({
-            token,
-            signedToken: myToken
+          const cache = {};
+          res.headers['set-cookie'].map(item => item.split(';')[0].trim()).map(item => item.split('=')).forEach(item => {
+            cache[item[0]] = item[1];
           });
 
-          if (!haveEnableToken || _cache.default.cache.expire && +new Date() > _cache.default.cache.expire) {
-            // 没有确认可用的token 解锁队列
-            haveEnableToken = true;
-            fly.unlock();
-            return fly.get(res.request.urlcopy, res.request.bodycopy).then(data => data).catch(e => e);
-          }
+          _cache.default.setCache(cache);
+
+          fly.unlock();
+          return fly.get(res.request.urlcopy, res.request.bodycopy).then(data => data).catch(e => e);
         }
       } catch (e) {
-        console.warn('返回cookie格式变化，请检查', res);
+        console.warn('返回cookie格式变化，请检查', res, e);
       }
 
+      fly.unlock();
       const status = res.data.ret[0];
 
       if (status.startsWith('SUCCESS')) {
@@ -115,6 +162,7 @@ function _default(createInstance) {
       return _ref.apply(this, arguments);
     };
   }(), e => {
+    console.warn(e);
     return Promise.reject({
       status: false,
       msg: '请求失败',
